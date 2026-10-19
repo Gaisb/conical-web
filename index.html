@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="claro">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seções Cônicas 3D &amp; 2D — Simulador e Caderno de Cálculo</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <!-- BARRA SUPERIOR -->
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-badge">3D + 2D</span>
+            <div>
+                <h1>Seções Cônicas</h1>
+                <p class="subtitle">Circunferência • Elipse • Parábola • Hipérbole</p>
+            </div>
+        </div>
+
+        <!-- SELETOR DE MODO E CÔNICAS -->
+        <nav class="conic-tabs" aria-label="Seleção de cônica">
+            <button class="tab-btn active" data-modo="quatro" title="Ver as 4 cônicas lado a lado como na imagem">
+                <span class="tab-dot dot-all"></span>
+                As 4 Cônicas (Imagem)
+            </button>
+            <button class="tab-btn" data-modo="unica" data-tipo="circunferencia">
+                <span class="tab-dot"></span>
+                Circunferência
+            </button>
+            <button class="tab-btn" data-modo="unica" data-tipo="elipse">
+                <span class="tab-dot"></span>
+                Elipse
+            </button>
+            <button class="tab-btn" data-modo="unica" data-tipo="parabola">
+                <span class="tab-dot"></span>
+                Parábola
+            </button>
+            <button class="tab-btn" data-modo="unica" data-tipo="hiperbole">
+                <span class="tab-dot"></span>
+                Hipérbole
+            </button>
+        </nav>
+
+        <!-- BOTÕES DE AÇÃO RÁPIDA -->
+        <div class="toolbar-actions">
+            <button id="btnGirar" class="tool-btn active" title="Ativar/desativar oscilação automática da câmera (Tecla R)">
+                Girar: ON
+            </button>
+            <button id="btnWireframe" class="tool-btn" title="Alternar malha wireframe (Tecla W)">
+                Malha
+            </button>
+            <button id="btnElementos" class="tool-btn active" title="Mostrar centro, focos e vértices (Tecla E)">
+                Focos/Vértices
+            </button>
+            <button id="btnVista2D" class="tool-btn active" title="Mostrar/ocultar vista 2D no plano do corte (Tecla 2)">
+                Vista 2D
+            </button>
+            <button id="btnTema" class="tool-btn" title="Alternar tema Claro / Escuro (Tecla B)">
+                Tema: Claro
+            </button>
+            <button id="btnPrint" class="tool-btn primary-outline" title="Baixar captura de tela em PNG (Tecla F10)">
+                Salvar PNG
+            </button>
+        </div>
+    </header>
+
+    <!-- LAYOUT PRINCIPAL EM 3 COLUNAS -->
+    <main class="workspace">
+        <!-- COLUNA ESQUERDA: EQUAÇÃO, PARÂMETROS E DADOS DA CÔNICA -->
+        <aside class="panel panel-left">
+            <section class="panel-section">
+                <div class="section-header">
+                    <h2 id="tituloConicaPainel">ELIPSE</h2>
+                    <span id="subtituloAngulo" class="badge-angle">0° &lt; α &lt; 45°</span>
+                </div>
+
+                <label for="inputEquacao" class="field-label">Digite sua equação ou parâmetros:</label>
+                <div class="input-row">
+                    <input
+                        id="inputEquacao"
+                        type="text"
+                        value="x²/25 + y²/9 = 1"
+                        placeholder="Ex.: x²/25 + y²/9 = 1, x² = 8y, r=4..."
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
+                    <button id="btnAplicar" class="btn-apply" title="Aplicar equação (Enter)">Aplicar</button>
+                </div>
+                <div class="input-hint">
+                    <span><strong>Enter</strong> aplica</span>
+                    <span>•</span>
+                    <span><strong>← → ↑ ↓</strong> ajustam parâmetros</span>
+                </div>
+
+                <div id="statusMensagem" class="status-box ok">
+                    OK — Elipse: a = 5, b = 3, c = 4
+                </div>
+
+                <div class="examples-group">
+                    <span class="examples-title">Exemplos rápidos (clique para testar):</span>
+                    <div class="chips-wrap">
+                        <button class="chip" data-eq="x² + y² = 16" data-tipo="circunferencia">Circ: x² + y² = 16</button>
+                        <button class="chip" data-eq="r=5" data-tipo="circunferencia">r = 5</button>
+                        <button class="chip" data-eq="x²/25 + y²/9 = 1" data-tipo="elipse">Elipse: x²/25 + y²/9 = 1</button>
+                        <button class="chip" data-eq="9x² + 25y² = 225" data-tipo="elipse">9x² + 25y² = 225</button>
+                        <button class="chip" data-eq="x² = 8y" data-tipo="parabola">Parábola: x² = 8y</button>
+                        <button class="chip" data-eq="y² = 12x" data-tipo="parabola">y² = 12x</button>
+                        <button class="chip" data-eq="x²/16 - y²/9 = 1" data-tipo="hiperbole">Hip: x²/16 - y²/9 = 1</button>
+                        <button class="chip" data-eq="y²/9 - x²/16 = 1" data-tipo="hiperbole">y²/9 - x²/16 = 1</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDERS DE AJUSTE AO VIVO -->
+            <section class="panel-section">
+                <h3>Ajuste Interativo dos Parâmetros</h3>
+                <div class="slider-group" id="grupoSliderA">
+                    <div class="slider-label-row">
+                        <label id="labelSliderA" for="sliderA">Semieixo a:</label>
+                        <span id="valorSliderA" class="slider-val">5.0</span>
+                    </div>
+                    <input id="sliderA" type="range" min="0.5" max="15" step="0.1" value="5.0" />
+                </div>
+
+                <div class="slider-group" id="grupoSliderB">
+                    <div class="slider-label-row">
+                        <label id="labelSliderB" for="sliderB">Semieixo b:</label>
+                        <span id="valorSliderB" class="slider-val">3.0</span>
+                    </div>
+                    <input id="sliderB" type="range" min="0.5" max="15" step="0.1" value="3.0" />
+                </div>
+            </section>
+
+            <!-- DADOS GEOMÉTRICOS E CORTE NO CONE -->
+            <section class="panel-section">
+                <h3>Equação Reduzida &amp; Elementos</h3>
+                <div id="equacaoReduzidaBox" class="formula-highlight">
+                    x²/25 + y²/9 = 1
+                </div>
+                <ul id="listaElementos" class="data-list"></ul>
+            </section>
+
+            <section class="panel-section">
+                <h3>Corte 3D no Cone Duplo (Calculado)</h3>
+                <div class="cone-math-card">
+                    <div class="math-line"><span>Superfície cônica:</span> <strong>x² + z² = y²</strong> (geratriz 45°)</div>
+                    <div class="math-line"><span>Plano de corte:</span> <strong id="txtPlanoEquacao">y + 0.686·z = 2.183</strong></div>
+                    <div class="math-line"><span>Inclinação do plano (α):</span> <strong id="txtPlanoAngulo">34.4°</strong></div>
+                    <div id="txtRelacaoAngulo" class="math-note">α &lt; 45° ⇒ corta apenas uma folha em curva fechada</div>
+                </div>
+            </section>
+        </aside>
+
+        <!-- ÁREA CENTRAL: SIMULAÇÃO 3D (GALERIA DAS 4 CÔNICAS OU VISTA ÚNICA DETALHADA) -->
+        <section class="viewport-area">
+            <!-- MODO 1: GALERIA 2x2 DAS 4 CÔNICAS (COMO NA IMAGEM ENVIADA) -->
+            <div id="galeriaQuatro" class="quad-gallery">
+                <div class="gallery-banner">
+                    <span>Visualização das <strong>4 Seções Cônicas</strong> (arraste com o mouse para girar em 3D ou clique em qualquer figura para abrir no modo detalhado)</span>
+                </div>
+                <div class="quad-grid">
+                    <div class="quad-card" data-card-tipo="circunferencia">
+                        <div class="quad-header">
+                            <span class="quad-badge">α = 0° (e = 0)</span>
+                            <button class="quad-expand-btn" data-abrir="circunferencia">Focar e Calcular →</button>
+                        </div>
+                        <div class="quad-canvas-wrap">
+                            <canvas id="canvasQuadCirc"></canvas>
+                        </div>
+                        <div class="quad-footer">
+                            <h4>Circunferência</h4>
+                            <p id="legendaQuadCirc">x² + y² = r² • Plano horizontal</p>
+                        </div>
+                    </div>
+
+                    <div class="quad-card active-card" data-card-tipo="elipse">
+                        <div class="quad-header">
+                            <span class="quad-badge">0° &lt; α &lt; 45° (0 &lt; e &lt; 1)</span>
+                            <button class="quad-expand-btn" data-abrir="elipse">Focar e Calcular →</button>
+                        </div>
+                        <div class="quad-canvas-wrap">
+                            <canvas id="canvasQuadElipse"></canvas>
+                        </div>
+                        <div class="quad-footer">
+                            <h4>Elipse</h4>
+                            <p id="legendaQuadElipse">x²/a² + y²/b² = 1 • Plano inclinado</p>
+                        </div>
+                    </div>
+
+                    <div class="quad-card" data-card-tipo="parabola">
+                        <div class="quad-header">
+                            <span class="quad-badge">α = 45° (e = 1)</span>
+                            <button class="quad-expand-btn" data-abrir="parabola">Focar e Calcular →</button>
+                        </div>
+                        <div class="quad-canvas-wrap">
+                            <canvas id="canvasQuadParabola"></canvas>
+                        </div>
+                        <div class="quad-footer">
+                            <h4>Parábola</h4>
+                            <p id="legendaQuadParabola">x² = 4py • Paralelo à geratriz</p>
+                        </div>
+                    </div>
+
+                    <div class="quad-card" data-card-tipo="hiperbole">
+                        <div class="quad-header">
+                            <span class="quad-badge">α &gt; 45° (e &gt; 1)</span>
+                            <button class="quad-expand-btn" data-abrir="hiperbole">Focar e Calcular →</button>
+                        </div>
+                        <div class="quad-canvas-wrap">
+                            <canvas id="canvasQuadHiperbole"></canvas>
+                        </div>
+                        <div class="quad-footer">
+                            <h4>Hipérbole</h4>
+                            <p id="legendaQuadHiperbole">x²/a² - y²/b² = 1 • Corta as 2 folhas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODO 2: SIMULAÇÃO 3D ÚNICA EM TELA CHEIA -->
+            <div id="vistaUnicaWrap" class="single-viewport hidden">
+                <canvas id="canvas3DPrincipal"></canvas>
+                <div class="viewport-overlay-top">
+                    <span id="badgeModoUnico" class="overlay-pill">Arraste para girar 3D • Roda do mouse para zoom</span>
+                    <button id="btnVoltarQuatro" class="btn-back-grid">⊞ Ver as 4 Cônicas Juntas</button>
+                </div>
+            </div>
+
+            <!-- JANELA FLUTUANTE / INSET DA VISTA 2D NO PLANO DO CORTE -->
+            <div id="painelVista2D" class="inset-2d-card">
+                <div class="inset-2d-header">
+                    <span>Vista 2D no Plano do Corte</span>
+                    <div class="inset-2d-controls">
+                        <label class="chk-mini" title="Animar ponto P ao longo da curva">
+                            <input type="checkbox" id="chkAnimarP" checked /> Ponto P
+                        </label>
+                        <button id="btnResetCamera" class="btn-mini" title="Resetar ângulo da câmera 3D">Reset 3D</button>
+                    </div>
+                </div>
+                <canvas id="canvasVista2D" width="310" height="225"></canvas>
+            </div>
+        </section>
+
+        <!-- COLUNA DIREITA: ESPAÇO PARA DIGITAÇÃO DO CÁLCULO E PASSO A PASSO -->
+        <aside class="panel panel-right">
+            <div class="calc-tabs">
+                <button class="calc-tab active" data-calctab="caderno">✏️ Espaço de Cálculo (Rascunho)</button>
+                <button class="calc-tab" data-calctab="passos">📐 Passo a Passo</button>
+            </div>
+
+            <!-- ABA 1: CADERNO DE DIGITAÇÃO DO CÁLCULO -->
+            <div id="abaCaderno" class="calc-tab-content">
+                <div class="calc-intro">
+                    <p>Digite abaixo o desenvolvimento do seu cálculo, anotações ou expressões matemáticas. Linhas com contas (ex.: <code>c = √(5² - 3²)</code>) são calculadas ao vivo!</p>
+                </div>
+
+                <!-- BARRA DE SÍMBOLOS MATEMÁTICOS -->
+                <div class="math-toolbar" aria-label="Inserir símbolos matemáticos">
+                    <button type="button" class="sym-btn" data-insert="²">x²</button>
+                    <button type="button" class="sym-btn" data-insert="√()">√</button>
+                    <button type="button" class="sym-btn" data-insert="±">±</button>
+                    <button type="button" class="sym-btn" data-insert="π">π</button>
+                    <button type="button" class="sym-btn" data-insert="Δ">Δ</button>
+                    <button type="button" class="sym-btn" data-insert="α">α</button>
+                    <button type="button" class="sym-btn" data-insert="θ">θ</button>
+                    <button type="button" class="sym-btn" data-insert="⇒">⇒</button>
+                    <button type="button" class="sym-btn" data-insert="≤">≤</button>
+                    <button type="button" class="sym-btn" data-insert="≥">≥</button>
+                    <button type="button" class="sym-btn" data-insert="F₁">F₁</button>
+                    <button type="button" class="sym-btn" data-insert="F₂">F₂</button>
+                </div>
+
+                <!-- ÁREA DE TEXTO DO CÁLCULO -->
+                <div class="notebook-editor-wrap">
+                    <textarea
+                        id="areaCalculoUsuario"
+                        class="notebook-textarea"
+                        spellcheck="false"
+                        placeholder="Digite aqui seus cálculos...&#10;Exemplo:&#10;a = 5&#10;b = 3&#10;c = √(a² - b²)&#10;e = c / a"
+                    ></textarea>
+                </div>
+
+                <!-- RESULTADOS AVALIADOS AO VIVO -->
+                <div class="live-eval-section">
+                    <div class="live-eval-header">
+                        <span>Resultados das Expressões Digitadas</span>
+                        <div class="notebook-actions">
+                            <button id="btnPreencherCalculo" class="btn-small" title="Trazer a resolução completa da cônica atual para o editor">
+                                Preencher c/ Cônica Atual
+                            </button>
+                            <button id="btnCopiarCalculo" class="btn-small" title="Copiar texto do cálculo">
+                                Copiar
+                            </button>
+                            <button id="btnLimparCalculo" class="btn-small danger-text" title="Limpar área de digitação">
+                                Limpar
+                            </button>
+                        </div>
+                    </div>
+                    <div id="listaResultadosCalculo" class="live-eval-list"></div>
+                </div>
+
+                <!-- CALCULADORA RÁPIDA DE PONTO (PERTENCE À CURVA?) -->
+                <div class="point-checker-box">
+                    <h4>Testar Ponto (x₀, y₀) na Equação</h4>
+                    <div class="point-inputs">
+                        <label>x₀ = <input type="number" id="inputTestX" value="5" step="0.5" /></label>
+                        <label>y₀ = <input type="number" id="inputTestY" value="0" step="0.5" /></label>
+                    </div>
+                    <div id="resultadoTestePonto" class="point-result"></div>
+                </div>
+            </div>
+
+            <!-- ABA 2: RESOLUÇÃO PASSO A PASSO AUTOMÁTICA -->
+            <div id="abaPassos" class="calc-tab-content hidden">
+                <div class="steps-header">
+                    <h3>Desenvolvimento Algébrico Completo</h3>
+                    <button id="btnEnviarParaCaderno" class="btn-small">Copiar para o Rascunho ✏️</button>
+                </div>
+                <div id="containerPassos" class="steps-container"></div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="conicas.js"></script>
+    <script src="analise.js"></script>
+    <script src="cena3d.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

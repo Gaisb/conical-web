@@ -1,0 +1,974 @@
+/* ============================================================================
+   ESTILOS — SIMULADOR DE SEÇÕES CÔNICAS 3D & 2D + CADERNO DE CÁLCULO
+   Suporta Tema Claro (padrão da imagem de referência) e Tema Escuro (C# original)
+   ============================================================================ */
+
+:root,
+html[data-tema="claro"] {
+    --bg-main: #f3f6fa;
+    --bg-panel: #ffffff;
+    --bg-panel-alt: #edf2f7;
+    --bg-input: #f8fafc;
+    --border-color: #d8e1ec;
+    --border-strong: #b8c7d9;
+    --text-primary: #141a24;
+    --text-secondary: #4a5568;
+    --text-muted: #64748b;
+    --accent: #1d4ed8;
+    --accent-soft: rgba(29, 78, 216, 0.1);
+    --curve-red: #d62028;
+    --curve-red-soft: rgba(214, 32, 40, 0.1);
+    --focus-amber: #d97706;
+    --vertex-green: #15803d;
+    --ok-bg: rgba(21, 128, 61, 0.1);
+    --ok-border: rgba(21, 128, 61, 0.35);
+    --ok-text: #166534;
+    --err-bg: rgba(214, 32, 40, 0.1);
+    --err-border: rgba(214, 32, 40, 0.4);
+    --err-text: #b91c1c;
+    --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 6px 20px rgba(15, 23, 42, 0.09);
+}
+
+html[data-tema="escuro"] {
+    --bg-main: #12121c;
+    --bg-panel: #0d0e17;
+    --bg-panel-alt: #181a28;
+    --bg-input: #1a1c2b;
+    --border-color: #2c3046;
+    --border-strong: #434868;
+    --text-primary: #ecf0f8;
+    --text-secondary: #b8c2d8;
+    --text-muted: #828ca0;
+    --accent: #5ac8ff;
+    --accent-soft: rgba(90, 200, 255, 0.14);
+    --curve-red: #ff4646;
+    --curve-red-soft: rgba(255, 70, 70, 0.15);
+    --focus-amber: #ffbe3c;
+    --vertex-green: #78ff8c;
+    --ok-bg: rgba(120, 255, 140, 0.1);
+    --ok-border: rgba(120, 255, 140, 0.35);
+    --ok-text: #78ff8c;
+    --err-bg: rgba(255, 105, 97, 0.12);
+    --err-border: rgba(255, 105, 97, 0.4);
+    --err-text: #ff6961;
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 8px 26px rgba(0, 0, 0, 0.5);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ==================== BARRA SUPERIOR ==================== */
+.topbar {
+    height: 58px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    gap: 12px;
+    flex-shrink: 0;
+    z-index: 20;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-badge {
+    background: var(--curve-red);
+    color: #fff;
+    font-weight: 800;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.4px;
+}
+
+.brand h1 {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    line-height: 1.1;
+}
+
+.brand .subtitle {
+    font-size: 11.5px;
+    color: var(--text-muted);
+}
+
+.conic-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-panel-alt);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(128, 128, 128, 0.08);
+}
+
+.tab-btn.active {
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--curve-red);
+}
+
+.tab-dot.dot-all {
+    background: linear-gradient(135deg, var(--curve-red) 50%, var(--accent) 50%);
+}
+
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tool-btn {
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tool-btn:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+.tool-btn.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.tool-btn.primary-outline {
+    border-color: var(--curve-red);
+    color: var(--curve-red);
+}
+
+.tool-btn.primary-outline:hover {
+    background: var(--curve-red);
+    color: #fff;
+}
+
+/* ==================== WORKSPACE PRINCIPAL ==================== */
+.workspace {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 350px 1fr 390px;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.panel {
+    background: var(--bg-panel);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.panel-left {
+    border-right: 1px solid var(--border-color);
+}
+
+.panel-right {
+    border-left: 1px solid var(--border-color);
+}
+
+.panel-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.section-header h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--curve-red);
+    letter-spacing: 0.4px;
+}
+
+.badge-angle {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.panel-section h3 {
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.input-row {
+    display: flex;
+    gap: 6px;
+}
+
+.input-row input {
+    flex: 1;
+    background: var(--bg-input);
+    border: 1.5px solid var(--border-strong);
+    color: var(--text-primary);
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 14px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.input-row input:focus {
+    border-color: var(--accent);
+}
+
+.btn-apply {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 0 14px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.btn-apply:hover {
+    filter: brightness(1.08);
+}
+
+.input-hint {
+    display: flex;
+    gap: 6px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 5px;
+}
+
+.status-box {
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.status-box.ok {
+    background: var(--ok-bg);
+    border: 1px solid var(--ok-border);
+    color: var(--ok-text);
+}
+
+.status-box.erro {
+    background: var(--err-bg);
+    border: 1px solid var(--err-border);
+    color: var(--err-text);
+}
+
+.examples-group {
+    margin-top: 10px;
+}
+
+.examples-title {
+    display: block;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.chips-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.chip {
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.12s;
+}
+
+.chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+}
+
+/* ==================== SLIDERS ==================== */
+.slider-group {
+    margin-bottom: 10px;
+}
+
+.slider-group:last-child {
+    margin-bottom: 0;
+}
+
+.slider-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.slider-val {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--accent);
+    font-weight: 700;
+}
+
+input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+/* ==================== LISTA DE ELEMENTOS E FÓRMULAS ==================== */
+.formula-highlight {
+    background: var(--bg-panel-alt);
+    border-left: 3.5px solid var(--accent);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 10px;
+}
+
+.data-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.data-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.data-list li:last-child {
+    border-bottom: none;
+}
+
+.data-key {
+    color: var(--text-secondary);
+}
+
+.data-val {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-weight: 700;
+}
+
+.data-val.val-vertice { color: var(--vertex-green); }
+.data-val.val-foco { color: var(--focus-amber); }
+.data-val.val-curva { color: var(--curve-red); }
+
+.cone-math-card {
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.math-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.math-note {
+    margin-top: 4px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ==================== VIEWPORT CENTRAL (GALERIA 4 CÔNICAS + ÚNICO) ==================== */
+.viewport-area {
+    position: relative;
+    background: var(--bg-main);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.quad-gallery {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 14px;
+    gap: 10px;
+    min-height: 0;
+}
+
+.gallery-banner {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.quad-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    min-height: 0;
+}
+
+.quad-card {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s, transform 0.15s;
+    cursor: grab;
+}
+
+.quad-card:active {
+    cursor: grabbing;
+}
+
+.quad-card.active-card {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-md);
+}
+
+.quad-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 2;
+}
+
+.quad-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    font-family: "JetBrains Mono", monospace;
+}
+
+.quad-expand-btn {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid transparent;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.quad-expand-btn:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+.quad-canvas-wrap {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+}
+
+.quad-canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.quad-footer {
+    padding: 6px 12px 8px;
+    text-align: center;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border-color);
+}
+
+.quad-footer h4 {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.quad-footer p {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-family: "JetBrains Mono", monospace;
+}
+
+/* MODO ÚNICO 3D */
+.single-viewport {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+
+.single-viewport:active {
+    cursor: grabbing;
+}
+
+.single-viewport canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.viewport-overlay-top {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+}
+
+.overlay-pill {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-back-grid {
+    pointer-events: auto;
+    background: var(--bg-panel);
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 12.5px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-back-grid:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+/* INSET 2D NO PLANO DO CORTE */
+.inset-2d-card {
+    position: absolute;
+    left: 14px;
+    bottom: 14px;
+    width: 312px;
+    background: var(--bg-panel);
+    border: 1.5px solid var(--border-strong);
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    z-index: 10;
+}
+
+.inset-2d-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--bg-panel-alt);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.inset-2d-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chk-mini {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.btn-mini {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* ==================== COLUNA DIREITA: CADERNO DE CÁLCULO ==================== */
+.calc-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-panel-alt);
+    flex-shrink: 0;
+}
+
+.calc-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    padding: 11px 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.calc-tab.active {
+    background: var(--bg-panel);
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.calc-tab-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 14px;
+    gap: 10px;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.calc-intro p {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.calc-intro code {
+    background: var(--bg-panel-alt);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: "JetBrains Mono", monospace;
+}
+
+.math-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.sym-btn {
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.sym-btn:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.notebook-editor-wrap {
+    flex: 1;
+    min-height: 190px;
+    display: flex;
+    flex-direction: column;
+}
+
+.notebook-textarea {
+    flex: 1;
+    width: 100%;
+    resize: none;
+    background: var(--bg-input);
+    border: 1.5px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text-primary);
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    outline: none;
+}
+
+.notebook-textarea:focus {
+    border-color: var(--accent);
+}
+
+.live-eval-section {
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.live-eval-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.notebook-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.btn-small {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-small:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn-small.danger-text:hover {
+    border-color: var(--curve-red);
+    color: var(--curve-red);
+}
+
+.live-eval-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 92px;
+    overflow-y: auto;
+}
+
+.eval-pill {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-strong);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.point-checker-box {
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.point-checker-box h4 {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+.point-inputs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.point-inputs label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.point-inputs input {
+    width: 72px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    padding: 4px 6px;
+    border-radius: 5px;
+    font-family: "JetBrains Mono", monospace;
+}
+
+.point-result {
+    font-size: 12px;
+    font-family: "JetBrains Mono", monospace;
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+/* ABA PASSO A PASSO */
+.steps-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.steps-header h3 {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.step-card {
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--border-color);
+    border-left: 3.5px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.step-card h4 {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 6px;
+}
+
+.step-card p {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 1180px) {
+    body {
+        height: auto;
+        overflow: auto;
+    }
+    .workspace {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
+    }
+    .viewport-area {
+        min-height: 620px;
+    }
+}
