@@ -44,3 +44,4 @@ npx serve .
 | **2** | Mostra / oculta a janela da Vista 2D no plano do corte |
 | **B** | Alterna entre **Tema Claro** (padrão da imagem) e **Tema Escuro** |
 | **F10** | Salva uma imagem `.png` da simulação |
+https://gaisb.github.io/conical-web/
